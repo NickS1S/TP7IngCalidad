@@ -1,0 +1,258 @@
+# .github/workflows/ci-cd-pipeline.yml
+name: Pipeline CI/CD - Ingeniería de Software
+
+# Configurar cuándo se ejecuta el pipeline
+on:
+  # Se ejecuta automáticamente cuando se crea un Pull Request hacia develop
+  pull_request:
+    branches: [ develop ]
+    types: [ opened, synchronize, reopened ]
+  
+  # Se ejecuta cuando se hace merge a develop
+  push:
+    branches: [ develop ]
+
+# Definir variables de entorno globales
+env:
+  NODE_VERSION: '18'
+  FIREBASE_PROJECT_ID: 'tu-proyecto-firebase-id'
+
+# Configurar permisos necesarios para el token de GitHub
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  # JOB 1: Análisis de Calidad de Código
+  code-quality:
+    name: '🔍 Análisis de Calidad de Código'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: '📥 Descargar código fuente'
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Necesario para análisis completo
+    
+    - name: '⚙️ Configurar Node.js'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: '📦 Instalar dependencias'
+      run: npm ci
+    
+    # Verificar que el código está correctamente formateado
+    - name: '💅 Verificar formato del código con Prettier'
+      run: |
+        npm run format:check || {
+          echo "❌ ¡Error en el formato del código!"
+          echo "Ejecuta 'npm run format' para corregir los problemas de formato"
+          exit 1
+        }
+    
+    # Verificar buenas prácticas con linter
+    - name: '🔧 Verificar calidad de código con ESLint'
+      run: |
+        npm run lint || {
+          echo "❌ ¡Error en el linting! Por favor corrige los problemas indicados arriba"
+          exit 1
+        }
+    
+    # Análisis estático adicional para detectar problemas
+    - name: '📝 Verificar compilación de TypeScript'
+      run: |
+        if [ -f "tsconfig.json" ]; then
+          npm run type-check || {
+            echo "❌ ¡Error en la compilación de TypeScript!"
+            exit 1
+          }
+        else
+          echo "ℹ️  No se encontró configuración de TypeScript, omitiendo verificación"
+        fi
+
+  # JOB 2: Pruebas Automatizadas
+  tests:
+    name: '🧪 Pruebas Automatizadas'
+    runs-on: ubuntu-latest
+    needs: code-quality  # Solo se ejecuta si code-quality es exitoso
+    
+    steps:
+    - name: '📥 Descargar código fuente'
+      uses: actions/checkout@v4
+    
+    - name: '⚙️ Configurar Node.js'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: '📦 Instalar dependencias'
+      run: npm ci
+    
+    # Ejecutar pruebas unitarias
+    - name: '🔬 Ejecutar Pruebas Unitarias'
+      run: |
+        npm run test:unit -- --coverage --watchAll=false || {
+          echo "❌ ¡Las pruebas unitarias fallaron!"
+          exit 1
+        }
+    
+    # Ejecutar pruebas de integración si existen
+    - name: '🔗 Ejecutar Pruebas de Integración'
+      run: |
+        if npm run | grep -q "test:integration"; then
+          npm run test:integration || {
+            echo "❌ ¡Las pruebas de integración fallaron!"
+            exit 1
+          }
+        else
+          echo "ℹ️  No hay pruebas de integración configuradas, omitiendo"
+        fi
+    
+    # Subir reporte de coverage
+    - name: '📊 Subir Reportes de Cobertura'
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        fail_ci_if_error: false
+        verbose: true
+
+  # JOB 3: Build del Proyecto
+  build:
+    name: '🏗️ Construcción de la Aplicación'
+    runs-on: ubuntu-latest
+    needs: [code-quality, tests]  # Solo se ejecuta si ambos jobs anteriores son exitosos
+    
+    steps:
+    - name: '📥 Descargar código fuente'
+      uses: actions/checkout@v4
+    
+    - name: '⚙️ Configurar Node.js'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: '📦 Instalar dependencias'
+      run: npm ci
+    
+    # Generar build de producción
+    - name: '🚀 Construir aplicación para producción'
+      run: |
+        npm run build || {
+          echo "❌ ¡Error en la construcción de la aplicación!"
+          exit 1
+        }
+    
+    # Guardar artefactos del build para deployment
+    - name: '💾 Guardar Artefactos de Construcción'
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          dist/
+          build/
+        retention-days: 30
+
+  # JOB 4: Security Scan (Opcional pero recomendado)
+  security-scan:
+    name: '🔒 Escaneo de Seguridad'
+    runs-on: ubuntu-latest
+    needs: code-quality
+    
+    steps:
+    - name: '📥 Descargar código fuente'
+      uses: actions/checkout@v4
+    
+    - name: '⚙️ Configurar Node.js'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: '📦 Instalar dependencias'
+      run: npm ci
+    
+    # Verificar vulnerabilidades en dependencias
+    - name: '🛡️ Ejecutar Auditoría de Seguridad'
+      run: |
+        npm audit --audit-level moderate || {
+          echo "⚠️  ¡Se encontraron vulnerabilidades de seguridad!"
+          echo "Ejecuta 'npm audit fix' para resolverlas"
+          exit 1
+        }
+
+  # JOB 5: Deployment a Development (Solo en merge a develop)
+  deploy-development:
+    name: '🚀 Despliegue a Desarrollo'
+    runs-on: ubuntu-latest
+    needs: [code-quality, tests, build, security-scan]
+    # Solo se ejecuta en merge a develop (no en Pull Requests)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    environment: development  # Requiere configurar este environment en GitHub
+    
+    steps:
+    - name: '📥 Descargar código fuente'
+      uses: actions/checkout@v4
+    
+    - name: '⚙️ Configurar Node.js'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: '📦 Descargar Artefactos de Construcción'
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: .
+    
+    # Instalar Firebase CLI
+    - name: '🔥 Instalar Firebase CLI'
+      run: npm install -g firebase-tools
+    
+    # Deploy a Firebase Hosting
+    - name: '🌐 Desplegar a Firebase Development'
+      run: |
+        firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+    
+    # Notificar resultado del deployment
+    - name: '✅ Notificación de Despliegue Exitoso'
+      if: success()
+      run: |
+        echo "🚀 ¡Despliegue a desarrollo completado exitosamente!"
+        echo "URL de la aplicación: https://${{ env.FIREBASE_PROJECT_ID }}.web.app"
+
+  # JOB 6: Status Check (Resumen final)
+  pipeline-status:
+    name: '📋 Resumen del Pipeline'
+    runs-on: ubuntu-latest
+    needs: [code-quality, tests, build, security-scan]
+    if: always()  # Se ejecuta siempre, incluso si hay fallos
+    
+    steps:
+    - name: '✅ Pipeline Exitoso'
+      if: needs.code-quality.result == 'success' && needs.tests.result == 'success' && needs.build.result == 'success' && needs.security-scan.result == 'success'
+      run: |
+        echo "✅ ¡Todas las verificaciones del pipeline pasaron exitosamente!"
+        echo "📊 Resumen:"
+        echo "  - Calidad de Código: ✅ Aprobado"
+        echo "  - Pruebas: ✅ Aprobado"  
+        echo "  - Construcción: ✅ Aprobado"
+        echo "  - Seguridad: ✅ Aprobado"
+    
+    - name: '❌ Pipeline Fallido'
+      if: needs.code-quality.result == 'failure' || needs.tests.result == 'failure' || needs.build.result == 'failure' || needs.security-scan.result == 'failure'
+      run: |
+        echo "❌ ¡El pipeline falló! Revisa los logs arriba para más detalles"
+        echo "📊 Resumen:"
+        echo "  - Calidad de Código: ${{ needs.code-quality.result == 'success' && '✅ Aprobado' || '❌ Falló' }}"
+        echo "  - Pruebas: ${{ needs.tests.result == 'success' && '✅ Aprobado' || '❌ Falló' }}"
+        echo "  - Construcción: ${{ needs.build.result == 'success' && '✅ Aprobado' || '❌ Falló' }}"
+        echo "  - Seguridad: ${{ needs.security-scan.result == 'success' && '✅ Aprobado' || '❌ Falló' }}"
+        exit 1

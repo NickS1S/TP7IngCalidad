@@ -1,12 +1,12 @@
 // src/pages/index.tsx - Página principal del proyecto
 import React, { useState } from 'react';
 import Button from '../components/Button';
-import { 
-  formatearFecha, 
-  validarEmail, 
-  calcularEdad, 
+import {
+  formatearFecha,
+  validarEmail,
+  calcularEdad,
   capitalizarTexto,
-  formatearMoneda 
+  formatearMoneda,
 } from '../utils/helpers';
 
 interface Usuario {
@@ -21,7 +21,7 @@ const HomePage: React.FC = () => {
   const [formulario, setFormulario] = useState({
     nombre: '',
     email: '',
-    fechaNacimiento: ''
+    fechaNacimiento: '',
   });
   const [errores, setErrores] = useState<string[]>([]);
   const [mensaje, setMensaje] = useState('');
@@ -62,7 +62,7 @@ const HomePage: React.FC = () => {
       id: Date.now().toString(),
       nombre: capitalizarTexto(formulario.nombre.trim()),
       email: formulario.email.trim(),
-      fechaNacimiento: new Date(formulario.fechaNacimiento)
+      fechaNacimiento: new Date(formulario.fechaNacimiento),
     };
 
     setUsuarios(prev => [...prev, nuevoUsuario]);
@@ -120,17 +120,22 @@ const HomePage: React.FC = () => {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             Agregar Usuario
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
-              <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="nombre"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Nombre completo
               </label>
               <input
                 id="nombre"
                 type="text"
                 value={formulario.nombre}
-                onChange={(e) => setFormulario(prev => ({ ...prev, nombre: e.target.value }))}
+                onChange={e =>
+                  setFormulario(prev => ({ ...prev, nombre: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Ingresa tu nombre"
                 data-testid="input-nombre"
@@ -138,14 +143,19 @@ const HomePage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email
               </label>
               <input
                 id="email"
                 type="email"
                 value={formulario.email}
-                onChange={(e) => setFormulario(prev => ({ ...prev, email: e.target.value }))}
+                onChange={e =>
+                  setFormulario(prev => ({ ...prev, email: e.target.value }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="tu.email@ejemplo.com"
                 data-testid="input-email"
@@ -153,14 +163,22 @@ const HomePage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="fechaNacimiento"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Fecha de nacimiento
               </label>
               <input
                 id="fechaNacimiento"
                 type="date"
                 value={formulario.fechaNacimiento}
-                onChange={(e) => setFormulario(prev => ({ ...prev, fechaNacimiento: e.target.value }))}
+                onChange={e =>
+                  setFormulario(prev => ({
+                    ...prev,
+                    fechaNacimiento: e.target.value,
+                  }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 data-testid="input-fecha"
               />
@@ -192,22 +210,39 @@ const HomePage: React.FC = () => {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Nombre</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Fecha Nacimiento</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Edad</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Acciones</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                      Nombre
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                      Email
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                      Fecha Nacimiento
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                      Edad
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                      Acciones
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {usuarios.map((usuario) => (
-                    <tr key={usuario.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  {usuarios.map(usuario => (
+                    <tr
+                      key={usuario.id}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
                       <td className="py-3 px-4">{usuario.nombre}</td>
                       <td className="py-3 px-4">{usuario.email}</td>
-                      <td className="py-3 px-4">{formatearFecha(usuario.fechaNacimiento)}</td>
-                      <td className="py-3 px-4">{calcularEdad(usuario.fechaNacimiento)} años</td>
                       <td className="py-3 px-4">
-                        <Button 
+                        {formatearFecha(usuario.fechaNacimiento)}
+                      </td>
+                      <td className="py-3 px-4">
+                        {calcularEdad(usuario.fechaNacimiento)} años
+                      </td>
+                      <td className="py-3 px-4">
+                        <Button
                           onClick={() => eliminarUsuario(usuario.id)}
                           variant="danger"
                           className="text-sm"
@@ -231,12 +266,21 @@ const HomePage: React.FC = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">{usuarios.length}</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {usuarios.length}
+                </p>
                 <p className="text-sm text-gray-600">Total Usuarios</p>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <p className="text-2xl font-bold text-green-600">
-                  {usuarios.length > 0 ? Math.round(usuarios.reduce((acc, u) => acc + calcularEdad(u.fechaNacimiento), 0) / usuarios.length) : 0}
+                  {usuarios.length > 0
+                    ? Math.round(
+                        usuarios.reduce(
+                          (acc, u) => acc + calcularEdad(u.fechaNacimiento),
+                          0
+                        ) / usuarios.length
+                      )
+                    : 0}
                 </p>
                 <p className="text-sm text-gray-600">Edad Promedio</p>
               </div>
@@ -252,9 +296,7 @@ const HomePage: React.FC = () => {
 
         {/* Footer */}
         <footer className="mt-12 text-center text-gray-500">
-          <p>
-            🎓 Proyecto de Ingeniería y Calidad de Software - UTN
-          </p>
+          <p>🎓 Proyecto de Ingeniería y Calidad de Software - UTN</p>
           <p className="mt-2">
             Pipeline automatizado con GitHub Actions, Jest, ESLint y Prettier
           </p>

@@ -4,7 +4,7 @@ import {
   validarEmail,
   calcularEdad,
   capitalizarTexto,
-  formatearMoneda
+  formatearMoneda,
 } from '../helpers';
 
 describe('Helpers - Funciones de utilidad', () => {

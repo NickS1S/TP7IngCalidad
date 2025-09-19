@@ -5,11 +5,11 @@ export const formatearFecha = (fecha: Date): string => {
   if (!fecha || !(fecha instanceof Date) || isNaN(fecha.getTime())) {
     return 'Fecha inválida';
   }
-  
+
   const dia = fecha.getDate().toString().padStart(2, '0');
   const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
   const anio = fecha.getFullYear();
-  
+
   return `${dia}/${mes}/${anio}`;
 };
 
@@ -18,7 +18,7 @@ export const validarEmail = (email: string): boolean => {
   if (!email || typeof email !== 'string') {
     return false;
   }
-  
+
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email.trim());
 };
@@ -28,7 +28,7 @@ export const calcularEdad = (fechaNacimiento: Date): number => {
   if (!fechaNacimiento || !(fechaNacimiento instanceof Date)) {
     return 0;
   }
-  
+
   const hoy = new Date();
   if (fechaNacimiento > hoy) return 0;
 
@@ -38,7 +38,10 @@ export const calcularEdad = (fechaNacimiento: Date): number => {
   const mesNacimiento = fechaNacimiento.getMonth();
   const diaNacimiento = fechaNacimiento.getDate();
 
-  if (mesActual < mesNacimiento || (mesActual === mesNacimiento && diaActual < diaNacimiento)) {
+  if (
+    mesActual < mesNacimiento ||
+    (mesActual === mesNacimiento && diaActual < diaNacimiento)
+  ) {
     edad--;
   }
 
@@ -48,7 +51,7 @@ export const calcularEdad = (fechaNacimiento: Date): number => {
 // Capitaliza la primera letra de cada palabra
 export const capitalizarTexto = (texto: string): string => {
   if (!texto || typeof texto !== 'string') return '';
-  
+
   return texto
     .toLowerCase()
     .split(' ')
@@ -64,10 +67,10 @@ export const generarId = (): string => {
 // Formatea un número como moneda argentina sin espacio extra
 export const formatearMoneda = (monto: number): string => {
   if (typeof monto !== 'number' || isNaN(monto)) return '$0,00';
-  
+
   const formatted = new Intl.NumberFormat('es-AR', {
     style: 'currency',
-    currency: 'ARS'
+    currency: 'ARS',
   }).format(monto);
 
   // Elimina cualquier espacio entre el $ y el número

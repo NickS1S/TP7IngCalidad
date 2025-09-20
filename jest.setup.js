@@ -1,10 +1,8 @@
-// jest.setup.js - Configuración inicial de Jest
+/* eslint-env jest */
 import '@testing-library/jest-dom';
 
-// Configuración global para pruebas
-global.console = {
-  ...console,
-  // Silenciar warnings en tests
-  warn: jest.fn(),
-  error: jest.fn(),
-};
+// Silenciar warnings y errores en la consola durante los tests
+beforeAll(() => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+});

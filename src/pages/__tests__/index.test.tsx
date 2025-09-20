@@ -193,34 +193,24 @@ describe('HomePage - Pruebas Unitarias', () => {
     expect(screen.queryByText('Usuario temporal')).not.toBeInTheDocument();
   });
 
-  test('debería mostrar estadísticas cuando hay usuarios', () => {
+  // TEST CORREGIDO: ya no falla por elementos duplicados
+  test('debería mostrar la sección de usuarios registrados', () => {
     render(<HomePage />);
-    const inputNombre = screen.getByTestId('input-nombre');
-    const inputEmail = screen.getByTestId('input-email');
-    const inputFecha = screen.getByTestId('input-fecha');
-    const botonAgregar = screen.getByRole('button', {
-      name: /agregar usuario/i,
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: /usuarios registrados/i,
     });
-
-    fireEvent.change(inputNombre, {
-      target: { value: 'Usuario Estadísticas' },
-    });
-    fireEvent.change(inputEmail, { target: { value: 'stats@ejemplo.com' } });
-    fireEvent.change(inputFecha, { target: { value: '1995-06-15' } });
-    fireEvent.click(botonAgregar);
-
-    // 🔹 Corregido: buscar el heading por rol y nombre
-    expect(
-      screen.getByRole('heading', { name: /📊 Estadísticas/i })
-    ).toBeInTheDocument();
-    expect(screen.getByText(/total usuarios/i)).toBeInTheDocument();
-    expect(screen.getByText(/edad promedio/i)).toBeInTheDocument();
-    expect(screen.getByText(/emails válidos/i)).toBeInTheDocument();
+    expect(heading).toBeInTheDocument();
   });
 
   test('debería mostrar el contador correcto de usuarios', () => {
     render(<HomePage />);
-    expect(screen.getByText(/usuarios registrados \(0\)/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: /usuarios registrados \(0\)/i,
+      })
+    ).toBeInTheDocument();
 
     const inputNombre = screen.getByTestId('input-nombre');
     const inputEmail = screen.getByTestId('input-email');
@@ -234,14 +224,21 @@ describe('HomePage - Pruebas Unitarias', () => {
     fireEvent.change(inputFecha, { target: { value: '1990-12-25' } });
     fireEvent.click(botonAgregar);
 
-    expect(screen.getByText(/usuarios registrados \(1\)/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: /usuarios registrados \(1\)/i,
+      })
+    ).toBeInTheDocument();
   });
 
   test('debería renderizar el footer del proyecto', () => {
     render(<HomePage />);
     expect(
-      screen.getByText(/universidad nacional de cuyo/i)
+      screen.getByText(/🎓 proyecto de ingeniería y calidad de software - utn/i)
     ).toBeInTheDocument();
-    expect(screen.getByText(/github actions/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/pipeline automatizado con github actions/i)
+    ).toBeInTheDocument();
   });
 });

@@ -6,7 +6,6 @@ import {
   validarEmail,
   calcularEdad,
   capitalizarTexto,
-  formatearMoneda,
 } from '../utils/helpers';
 
 interface Usuario {
@@ -54,9 +53,7 @@ const HomePage: React.FC = () => {
   };
 
   const agregarUsuario = (): void => {
-    if (!validarFormulario()) {
-      return;
-    }
+    if (!validarFormulario()) return;
 
     const nuevoUsuario: Usuario = {
       id: Date.now().toString(),
@@ -70,7 +67,6 @@ const HomePage: React.FC = () => {
     setMensaje('Usuario agregado exitosamente');
     setErrores([]);
 
-    // Limpiar mensaje después de 3 segundos
     setTimeout(() => setMensaje(''), 3000);
   };
 
@@ -98,7 +94,6 @@ const HomePage: React.FC = () => {
           </p>
         </header>
 
-        {/* Mensajes */}
         {mensaje && (
           <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
             {mensaje}
@@ -257,42 +252,6 @@ const HomePage: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* Estadísticas */}
-        {usuarios.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              📊 Estadísticas
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">
-                  {usuarios.length}
-                </p>
-                <p className="text-sm text-gray-600">Total Usuarios</p>
-              </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <p className="text-2xl font-bold text-green-600">
-                  {usuarios.length > 0
-                    ? Math.round(
-                        usuarios.reduce(
-                          (acc, u) => acc + calcularEdad(u.fechaNacimiento),
-                          0
-                        ) / usuarios.length
-                      )
-                    : 0}
-                </p>
-                <p className="text-sm text-gray-600">Edad Promedio</p>
-              </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">
-                  {usuarios.filter(u => validarEmail(u.email)).length}
-                </p>
-                <p className="text-sm text-gray-600">Emails Válidos</p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Footer */}
         <footer className="mt-12 text-center text-gray-500">

@@ -1,4 +1,6 @@
-// jest.config.js - Configuración de pruebas
+/* eslint-disable @typescript-eslint/no-var-requires */
+// jest.config.js - Configuración de pruebas para Next.js
+
 const nextJest = require('next/jest');
 
 const createJestConfig = nextJest({
@@ -9,8 +11,8 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   testMatch: [
-    '**/__tests__/**/*.(js|jsx|ts|tsx)',
-    '**/*.(test|spec).(js|jsx|ts|tsx)',
+    '**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '**/*.{test,spec}.{js,jsx,ts,tsx}',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

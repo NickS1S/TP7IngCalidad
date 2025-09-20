@@ -11,8 +11,8 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   testMatch: [
-    '**/__tests__/**/*.unit.test.{js,jsx,ts,tsx}',
-    '**/__tests__/**/*.integration.test.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/*.unit.test.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/*.integration.test.{js,jsx,ts,tsx}',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

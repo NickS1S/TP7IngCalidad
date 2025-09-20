@@ -15,7 +15,7 @@ on:
 # Definir variables de entorno globales
 env:
   NODE_VERSION: '18'
-  FIREBASE_PROJECT_ID: 'tu-proyecto-firebase-id'
+  FIREBASE_PROJECT_ID: 'tp7ingycalidad'
 
 # Configurar permisos necesarios para el token de GitHub
 permissions:
@@ -153,8 +153,7 @@ jobs:
       with:
         name: build-artifacts
         path: |
-          dist/
-          build/
+          out/
         retention-days: 30
 
   # JOB 4: Security Scan (Opcional pero recomendado)

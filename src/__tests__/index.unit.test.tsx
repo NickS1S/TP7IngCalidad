@@ -1,4 +1,5 @@
 // src/pages/__tests__/index.test.tsx - Pruebas de la página principal
+//1
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
